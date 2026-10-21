@@ -22,10 +22,11 @@ class InvertedIndex:
         ]
 
         return [
-            commit_hash for commit_hash in candidates
+            commit_hash
+            for commit_hash in candidates
             if all(commit_hash in matches for matches in remaining)
         ]
 
-    def find_author(self, author:str) -> list[str]:
+    def find_author(self, author: str) -> list[str]:
         """작성자 이름이 정확히 일치하는 커밋을 반환"""
         return list(self.author_index.get(author, []))

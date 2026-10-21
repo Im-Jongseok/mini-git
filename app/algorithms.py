@@ -1,7 +1,10 @@
 from collections.abc import Mapping, Sequence
+from typing import TypeVar
+
+T = TypeVar("T")
 
 
-def merge_sort(items: list, key) -> list:
+def merge_sort(items: list[T], key) -> list[T]:
     """key 기준으로 안전 병합 정렬"""
     if len(items) < 2:
         return list(items)
