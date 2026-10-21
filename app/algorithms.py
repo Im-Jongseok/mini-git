@@ -37,8 +37,8 @@ def topological_order(parents: dict[str, tuple[str, ...]]) -> list[str]:
             indegree[child] -= 1
             if indegree[child] == 0:
                 ready.append(child)
-        if len(ready) != len(parents):
-            raise ValueError("Cycle detected")
+    if len(ready) != len(parents):
+        raise ValueError("Cycle detected")
     return ready
 
 
