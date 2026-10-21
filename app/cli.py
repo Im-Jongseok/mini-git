@@ -10,7 +10,7 @@ def format_commits(commits: list[Commit]) -> str:
     """커밋의 식별자, 작성자, 시각과 메시지를 출력 문자열 만듦"""
     return (
         "\n".join(
-            f"commit {commit.hash} ({commit.author}, {commit.timestamp})\n"
+            f"commit {commit.hash[:8]} ({commit.author}, {commit.timestamp})\n"
             f"    {commit.message}"
             for commit in commits
         )
@@ -100,12 +100,14 @@ def _run_command(repo: Repository, args: argparse.Namespace) -> str:
             return f"Switched to branch: {args.name}"
         case "commit":
             commit = repo.commit(args.message)
-            return f"[{repo.head} {commit.hash}] {commit.message}"
+            return f"[{repo.head} {commit.hash[:8]}] {commit.message}"
         case "log":
             return format_commits(repo.log(args.sort_by))
         case "path":
             path = repo.path(args.start, args.goal)
-            return "Path: " + " -> ".join(path) if path else "No path"
+            if not path:
+                return "No path"
+            return "Path: " + " -> ".join(name[:8] for name in path)
         case "ancestors":
             return format_commits(repo.ancestors(args.commit_hash))
         case "search":

@@ -55,9 +55,19 @@ class Repository:
         self.branches[self.head] = commit_hash
         return self.commits[commit_hash]
 
-    def _require_commit(self, commit_hash: str) -> None:
-        if commit_hash not in self.commits:
+    def _resolve_commit(self, commit_hash: str) -> str:
+        if commit_hash in self.commits:
+            return commit_hash
+        matches = [
+            name
+            for name in self.commits
+            if commit_hash and name.startswith(commit_hash)
+        ]
+        if not matches:
             raise ValueError(f"Unknown commit: {commit_hash}")
+        if len(matches) > 1:
+            raise ValueError(f"Ambiguous commit: {commit_hash}")
+        return matches[0]
 
     def log(self, sort_by: str | None = None) -> list[Commit]:
         """기본은 위상 순서, 옵션이 있으면 날짜 또는 작성자 순서로 조회한다."""
@@ -76,8 +86,8 @@ class Repository:
 
     def path(self, start: str, goal: str) -> list[str] | None:
         """존재하는 두 커밋 사이의 최단 경로를 조회한다."""
-        self._require_commit(start)
-        self._require_commit(goal)
+        start = self._resolve_commit(start)
+        goal = self._resolve_commit(goal)
         neighbors = {node: [] for node in self.parent_map}
         for node, values in self.parent_map.items():
             for parent in values:
@@ -102,7 +112,7 @@ class Repository:
 
     def ancestors(self, commit_hash: str) -> list[Commit]:
         """지정한 커밋의 모든 조상을 조회한다."""
-        self._require_commit(commit_hash)
+        commit_hash = self._resolve_commit(commit_hash)
         return [
             self.commits[name]
             for name in algorithms.dfs(self.parent_map, commit_hash)[1:]
