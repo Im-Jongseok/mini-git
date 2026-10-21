@@ -7,7 +7,7 @@ def merge_sort(items: list, key) -> list:
         return list(items)
     middle = len(items) // 2
     left = merge_sort(items[:middle], key)
-    right = merge_sort(items[:middle], key)
+    right = merge_sort(items[middle:], key)
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
