@@ -6,16 +6,21 @@ from app.models import Commit
 from app.repository import Repository
 
 
-def format_commits(commits: list[Commit]) -> str:
-    """커밋의 식별자, 작성자, 시각과 메시지를 출력 문자열 만듦"""
-    return (
-        "\n".join(
-            f"commit {commit.hash[:8]} ({commit.author}, {commit.timestamp})\n"
-            f"    {commit.message}"
-            for commit in commits
+def format_commits(
+    commits: list[Commit], commit_branches: dict[str, str] | None = None
+) -> str:
+    """커밋 목록과 생성 브랜치를 출력 문자열로 만든다."""
+    labels = commit_branches or {}
+    lines = []
+    for commit in commits:
+        header = (
+            f"commit {commit.hash[:8]} ({commit.author}, {commit.timestamp})"
         )
-        or "No commits found."
-    )
+        branch = labels.get(commit.hash)
+        if branch is not None:
+            header += f" [{branch}]"
+        lines.extend([header, f"    {commit.message}"])
+    return "\n".join(lines) or "No commits found."
 
 
 class CommandParser(argparse.ArgumentParser):
@@ -102,7 +107,7 @@ def _run_command(repo: Repository, args: argparse.Namespace) -> str:
             commit = repo.commit(args.message)
             return f"[{repo.head} {commit.hash[:8]}] {commit.message}"
         case "log":
-            return format_commits(repo.log(args.sort_by))
+            return format_commits(repo.log(args.sort_by), repo.commit_branches)
         case "path":
             path = repo.path(args.start, args.goal)
             if not path:

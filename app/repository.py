@@ -15,6 +15,7 @@ class Repository:
         self.head = "main"
         self.branches: dict[str, str | None] = {"main": None}
         self.commits: dict[str, Commit] = {}
+        self.commit_branches: dict[str, str] = {}
         self.parent_map: dict[str, tuple[str, ...]] = {}
         self.index = InvertedIndex()
 
@@ -50,6 +51,7 @@ class Repository:
                 raise ValueError("Hash collision")
         else:
             self.commits[commit_hash] = commit
+            self.commit_branches[commit_hash] = self.head
             self.parent_map[commit_hash] = commit.parents
             self.index.add(commit_hash, message, self.author)
         self.branches[self.head] = commit_hash
