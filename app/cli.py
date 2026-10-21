@@ -80,7 +80,8 @@ def _initialize(
     repo: Repository | None, author: str
 ) -> tuple[Repository, str]:
     if repo is not None:
-        raise ValueError("Already initialized")
+        repo.set_author(author)
+        return repo, f"Current user: {repo.author}"
     return Repository(author), (
         "Initialized repository.\nCurrent branch: main\n"
         f"Current user: {author}"

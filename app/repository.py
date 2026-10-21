@@ -11,13 +11,19 @@ class Repository:
     """커밋, 브랜치, HEAD, 역색인 저장·조회·관리"""
 
     def __init__(self, author: str):
-        self.author = author
+        self.set_author(author)
         self.head = "main"
         self.branches: dict[str, str | None] = {"main": None}
         self.commits: dict[str, Commit] = {}
         self.commit_branches: dict[str, str] = {}
         self.parent_map: dict[str, tuple[str, ...]] = {}
         self.index = InvertedIndex()
+
+    def set_author(self, author: str) -> None:
+        """이후 커밋에 사용할 작성자를 변경한다."""
+        if not author.strip():
+            raise ValueError("Invalid args")
+        self.author = author
 
     def branch(self, name: str) -> None:
         """현재 커밋을 가리키는 브랜치 생성"""
